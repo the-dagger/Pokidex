@@ -59,12 +59,12 @@ class MainActivity : BaseCameraActivity() {
         rvLabel.layoutManager = LinearLayoutManager(this)
 
 //        Load a cloud model using the FirebaseCloudModelSource Builder class
-//        val cloudSource = FirebaseCloudModelSource.Builder("pokedex")
-//                .enableModelUpdates(true)
-//                .build()
+        val cloudSource = FirebaseCloudModelSource.Builder("pokedex")
+                .enableModelUpdates(true)
+                .build()
 
         //Registering the cloud model loaded above with the ModelManager Singleton
-//        FirebaseModelManager.getInstance().registerCloudModelSource(cloudSource)
+        FirebaseModelManager.getInstance().registerCloudModelSource(cloudSource)
 
         //Load a local model using the FirebaseLocalModelSource Builder class
         val fireBaseLocalModelSource = FirebaseLocalModelSource.Builder("pokedex")
