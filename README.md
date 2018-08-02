@@ -1,4 +1,4 @@
-# Pokdex
+# Pokedex
 Android app that identifies and detects Pokemon in the provided Image using Tensorflow and Firebase MLKit.
 
 # Screenshots 
