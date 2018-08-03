@@ -1,5 +1,6 @@
 package app.harshit.pokdex
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.RecyclerView
@@ -22,6 +23,7 @@ class PokemonAdapter(private val pokeList: List<Pokemon>) : RecyclerView.Adapter
 
     override fun getItemCount() = pokeList.size
 
+    @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: PokeHolder, position: Int) {
 
         val currentItem = pokeList[position]
@@ -31,7 +33,7 @@ class PokemonAdapter(private val pokeList: List<Pokemon>) : RecyclerView.Adapter
             currentItem.accuracy < .30 -> holder.itemView.itemAccuracy.setTextColor(ContextCompat.getColor(context, R.color.red))
             else -> holder.itemView.itemAccuracy.setTextColor(ContextCompat.getColor(context, R.color.orange))
         }
-        holder.itemView.itemName.text = currentItem.name
+        holder.itemView.itemName.text = "${currentItem.name[0].toUpperCase()}${currentItem.name.substring(1)}"
         holder.itemView.itemAccuracy.text = "Probability : ${(currentItem.accuracy * 100).toInt()}%"
     }
 
