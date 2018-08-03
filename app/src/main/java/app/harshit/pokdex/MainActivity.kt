@@ -68,7 +68,7 @@ class MainActivity : BaseCameraActivity() {
 
         //Load a local model using the FirebaseLocalModelSource Builder class
         val fireBaseLocalModelSource = FirebaseLocalModelSource.Builder("pokedex")
-                .setAssetFilePath("pokedex.tflite")
+                .setAssetFilePath("pokedex_83.tflite")
                 .build()
 
         //Registering the model loaded above with the ModelManager Singleton
@@ -76,7 +76,7 @@ class MainActivity : BaseCameraActivity() {
 
         val firebaseModelOptions = FirebaseModelOptions.Builder()
                 .setLocalModelName("pokedex")
-//                .setCloudModelName("pokedex")
+                .setCloudModelName("pokedex")
                 .build()
 
         fireBaseInterpreter = FirebaseModelInterpreter.getInstance(firebaseModelOptions)!!
