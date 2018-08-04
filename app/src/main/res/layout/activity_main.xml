@@ -5,6 +5,9 @@
     android:layout_height="match_parent">
 
     <com.wonderkiln.camerakit.CameraView
+        app:ckPinchToZoom="true"
+        app:ckMethod="speed"
+        app:ckFocus="tapWithMarker"
         android:id="@+id/cameraView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:title="General">
+
+        <Preference
+            android:summary="Buy me a beer!"
+            android:title="Donate">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="https://github.com/the-dagger/Pokedex" />
+        </Preference>
+
+        <Preference
+            android:summary="Rate the app on Play Store"
+            android:title="Rate">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="https://github.com/the-dagger/Pokedex" />
+        </Preference>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="About">
+
+        <Preference
+            android:summary="About the app"
+            android:title="About">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="https://github.com/the-dagger/Pokedex" />
+        </Preference>
+
+        <Preference
+            android:key="buildVersion"
+            android:title="Build Version" />
+
+    </PreferenceCategory>
+</PreferenceScreen>
