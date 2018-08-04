@@ -1,9 +1,12 @@
 package app.harshit.pokdex
 
+import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.support.design.widget.BottomSheetBehavior
 import android.support.v7.widget.LinearLayoutManager
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import com.google.firebase.FirebaseApp
 import com.google.firebase.ml.custom.*
@@ -51,6 +54,8 @@ class MainActivity : BaseCameraActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
         setupBottomSheet(R.layout.pokemon_sheet)
         imgData = ByteBuffer.allocateDirect(
                 4 * DIM_BATCH_SIZE * DIM_IMG_SIZE_X * DIM_IMG_SIZE_Y * DIM_PIXEL_SIZE);
@@ -102,7 +107,7 @@ class MainActivity : BaseCameraActivity() {
     }
 
     private fun convertBitmapToByteBuffer(bitmap: Bitmap?): ByteBuffer {
-        //Clear the Bytebuffer for a new image
+        //Clear the ByteBuffer for a new image
         imgData.rewind()
         bitmap?.getPixels(intValues, 0, bitmap.width, 0, 0, bitmap.width, bitmap.height)
         // Convert the image to floating point.
@@ -147,6 +152,18 @@ class MainActivity : BaseCameraActivity() {
                     it.printStackTrace()
                     fabProgressCircle.hide()
                 }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        if (item?.itemId == R.id.action_settings) {
+            startActivity(Intent(this, SettingsActivity::class.java))
+        }
+        return true
     }
 
 }

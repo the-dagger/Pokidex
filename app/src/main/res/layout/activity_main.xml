@@ -17,10 +17,10 @@
         android:visibility="gone">
 
         <ImageView
-            android:scaleType="centerCrop"
             android:id="@+id/imagePreview"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop" />
 
         <ImageButton
             android:id="@+id/btnRetry"
@@ -29,7 +29,7 @@
             android:layout_gravity="center"
             android:background="@null"
             android:scaleType="centerCrop"
-            android:src="@drawable/ic_refresh" />
+            app:srcCompat="@drawable/ic_refresh" />
 
     </FrameLayout>
 
@@ -44,7 +44,7 @@
         android:id="@+id/fabProgressCircle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:arcColor="@color/colorAccent"
+        app:arcColor="@color/white"
         app:arcWidth="4dp">
 
         <android.support.design.widget.FloatingActionButton
@@ -54,10 +54,17 @@
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             android:layout_margin="16dp"
-            android:src="@drawable/ic_camera"
             app:backgroundTint="@color/colorPrimary"
             app:fabSize="normal"
-            app:rippleColor="@color/colorAccent" />
+            app:rippleColor="@color/colorAccent"
+            app:srcCompat="@drawable/ic_camera" />
 
     </com.github.jorgecastilloprz.FABProgressCircle>
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@null" />
+
 </android.support.design.widget.CoordinatorLayout>

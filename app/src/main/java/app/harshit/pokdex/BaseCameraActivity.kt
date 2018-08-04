@@ -23,7 +23,7 @@ abstract class BaseCameraActivity : AppCompatActivity(), View.OnClickListener {
         fab_take_photo.setOnClickListener(this)
     }
 
-    fun setupBottomSheet(@LayoutRes id : Int){
+    fun setupBottomSheet(@LayoutRes id: Int) {
         //Using a ViewStub since changing the layout of an <include> tag dynamically wasn't possible
         stubView.layoutResource = id
         val inflatedView = stubView.inflate()
@@ -39,12 +39,6 @@ abstract class BaseCameraActivity : AppCompatActivity(), View.OnClickListener {
         lp.anchorGravity = Gravity.END
         fabProgressCircle.layoutParams = lp
         //Hide the fab as bottomSheet is expanded
-        sheetBehavior.setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
-            override fun onStateChanged(bottomSheet: View, newState: Int) {}
-            override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                fab_take_photo.animate().scaleX(1 - slideOffset).scaleY(1 - slideOffset).setDuration(0).start()
-            }
-        })
     }
 
     override fun onResume() {
@@ -62,7 +56,7 @@ abstract class BaseCameraActivity : AppCompatActivity(), View.OnClickListener {
         cameraView.visibility = View.GONE
     }
 
-    protected fun hidePreview() {
+    private fun hidePreview() {
         framePreview.visibility = View.GONE
         cameraView.visibility = View.VISIBLE
     }
