@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory
-        android:title="General">
+    <PreferenceCategory android:title="General">
 
         <Preference
             android:summary="Buy me a beer!"
@@ -19,6 +18,11 @@
                 android:action="android.intent.action.VIEW"
                 android:data="https://github.com/the-dagger/Pokedex" />
         </Preference>
+
+        <Preference
+            android:key="loginout"
+            android:summary="Rate the app on Play Store"
+            android:title="Logout" />
 
     </PreferenceCategory>
 

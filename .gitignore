@@ -8,3 +8,5 @@
 /build
 /captures
 .externalNativeBuild
+client_id.xml
+google-services.json

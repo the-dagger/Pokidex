@@ -12,6 +12,8 @@
         app:cameraFacing="back"
         app:cameraJpegQuality="100"
         app:cameraWhiteBalance="auto"
+        app:cameraAudio="off"
+        android:soundEffectsEnabled="false"
         app:cameraPlaySounds="false" />
 
     <FrameLayout
@@ -58,7 +60,7 @@
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             android:layout_margin="16dp"
-            app:backgroundTint="@color/colorPrimary"
+            app:backgroundTint="@color/colorAccent"
             app:fabSize="normal"
             app:rippleColor="@color/colorAccent"
             app:srcCompat="@drawable/ic_camera" />
