@@ -8,10 +8,11 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import com.google.firebase.FirebaseApp
 import com.google.firebase.ml.custom.*
 import com.google.firebase.ml.custom.model.FirebaseCloudModelSource
 import com.google.firebase.ml.custom.model.FirebaseLocalModelSource
+import com.otaliastudios.cameraview.CameraListener
+import com.otaliastudios.cameraview.CameraUtils
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.pokemon_sheet.*
 import java.nio.ByteBuffer
@@ -73,7 +74,7 @@ class MainActivity : BaseCameraActivity() {
 
         //Load a local model using the FirebaseLocalModelSource Builder class
         val fireBaseLocalModelSource = FirebaseLocalModelSource.Builder("pokedex")
-                .setAssetFilePath("pokedex_83.tflite")
+                .setAssetFilePath("pokedex_84.tflite")
                 .build()
 
         //Registering the model loaded above with the ModelManager Singleton
@@ -94,16 +95,17 @@ class MainActivity : BaseCameraActivity() {
 
     override fun onClick(v: View?) {
         fabProgressCircle.show()
-        cameraView.captureImage { cameraKitImage ->
-            // Get the Bitmap from the captured shot
-
-            val scaledBitmap = Bitmap.createScaledBitmap(cameraKitImage.bitmap, 224, 224, false)
-            getPokemonFromBitmap(scaledBitmap)
-            runOnUiThread {
-                showPreview()
-                imagePreview.setImageBitmap(cameraKitImage.bitmap)
+        cameraView.addCameraListener(object : CameraListener(){
+            override fun onPictureTaken(jpeg: ByteArray?) {
+                CameraUtils.decodeBitmap(jpeg) {
+                    val scaledBitmap = Bitmap.createScaledBitmap(it, 224, 224, false)
+                    getPokemonFromBitmap(scaledBitmap)
+                    showPreview()
+                    imagePreview.setImageBitmap(it)
+                }
             }
-        }
+        })
+        cameraView.capturePicture()
     }
 
     private fun convertBitmapToByteBuffer(bitmap: Bitmap?): ByteBuffer {

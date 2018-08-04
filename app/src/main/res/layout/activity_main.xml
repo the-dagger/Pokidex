@@ -4,14 +4,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.wonderkiln.camerakit.CameraView
-        app:ckPinchToZoom="true"
-        app:ckMethod="speed"
-        app:ckFocus="tapWithMarker"
+    <com.otaliastudios.cameraview.CameraView
         android:id="@+id/cameraView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:adjustViewBounds="true" />
+        android:layout_height="match_parent"
+        android:keepScreenOn="true"
+        app:cameraFacing="back"
+        app:cameraJpegQuality="100"
+        app:cameraWhiteBalance="auto"
+        app:cameraPlaySounds="false" />
 
     <FrameLayout
         android:id="@+id/framePreview"
