@@ -21,3 +21,10 @@
 #-renamesourcefileattribute SourceFile
 -keep public class com.google.android.gms.* { public *; }
 -dontwarn com.google.android.gms.**
+
+-keepattributes *Annotation*
+-keepattributes SourceFile,LineNumberTable
+-keep public class * extends java.lang.Exception
+
+-keep class com.crashlytics.** { *; }
+-dontwarn com.crashlytics.**

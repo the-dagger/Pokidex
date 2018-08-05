@@ -10,6 +10,7 @@ import android.graphics.Matrix
 import android.os.Build
 import android.os.Bundle
 import android.support.design.widget.BottomSheetBehavior
+import android.support.media.ExifInterface
 import android.support.v4.app.NotificationCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.view.Menu
@@ -33,6 +34,7 @@ import kotlinx.android.synthetic.main.pokemon_sheet.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.toast
 import org.jetbrains.anko.uiThread
+import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -155,11 +157,20 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
 
     fun convertByteArrayToBitmap(byteArray: ByteArray) {
         //Handle this shit in bg
+
         doAsync {
+            val exifInterface = ExifInterface(ByteArrayInputStream(byteArray))
+            val orientation = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1)
             var bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
             val m = Matrix()
             //to fix images coming out to be rotated
-            m.postRotate(90F)
+            when (orientation) {
+                ExifInterface.ORIENTATION_ROTATE_90 -> m.postRotate(90F)
+
+                ExifInterface.ORIENTATION_ROTATE_180 -> m.postRotate(180F)
+
+                ExifInterface.ORIENTATION_ROTATE_270 -> m.postRotate(270F)
+            }
             bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, m, true)
             currentBitmap = bitmap
             val scaledBitmap = Bitmap.createScaledBitmap(bitmap, 224, 224, false)

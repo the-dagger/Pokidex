@@ -1,8 +1,7 @@
 apply plugin: 'com.android.application'
-
 apply plugin: 'kotlin-android'
-
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'io.fabric'
 
 android {
     compileSdkVersion 27
@@ -10,7 +9,7 @@ android {
         applicationId "app.harshit.pokedex"
         minSdkVersion 19
         targetSdkVersion 27
-        versionCode 2
+        versionCode 5
         versionName "1.0-beta1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         aaptOptions {
@@ -36,6 +35,7 @@ dependencies {
     implementation "com.android.support:support-vector-drawable:$supportLibVersion"
     implementation "com.android.support:design:$supportLibVersion"
     implementation "com.android.support:cardview-v7:$supportLibVersion"
+    implementation "com.android.support:exifinterface:$supportLibVersion"
 
     //Firebase and Play Services
     implementation "com.google.firebase:firebase-core:$firebaseVersion"
@@ -45,9 +45,10 @@ dependencies {
     implementation "com.google.firebase:firebase-storage:$firebaseVersion"
     implementation "com.google.firebase:firebase-ml-model-interpreter:16.0.0"
     implementation 'com.firebaseui:firebase-ui-auth:4.1.0'
+    implementation 'com.android.billingclient:billing:1.1'
+    implementation 'com.crashlytics.sdk.android:crashlytics:2.9.4'
     //Other third party libs
     implementation "org.jetbrains.anko:anko-commons:$anko_version"
-    implementation 'com.android.billingclient:billing:1.1'
     implementation 'com.otaliastudios:cameraview:1.5.1'
     implementation 'com.github.jorgecastilloprz:fabprogresscircle:1.01@aar'
     implementation 'com.github.apl-devs:appintro:v4.2.3'
