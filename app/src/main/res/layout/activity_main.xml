@@ -10,7 +10,7 @@
         android:layout_height="match_parent"
         android:keepScreenOn="true"
         app:cameraFacing="back"
-        app:cameraJpegQuality="85"
+        app:cameraJpegQuality="60"
         app:cameraWhiteBalance="auto"
         app:cameraAudio="off"
         android:soundEffectsEnabled="false"

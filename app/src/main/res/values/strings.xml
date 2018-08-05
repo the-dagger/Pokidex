@@ -11,4 +11,9 @@
     <string name="logout_message">The app will start again</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="feedback_notification">Notification for processing the feedback</string>
+    <string name="sending_feedback">Sending Feedback</string>
+    <string name="feedback_in_progress">Feedback in progress</string>
+    <string name="thanks_for_feedback">Thank you for the feedback!</string>
+    <string name="feedback_failed">Failed to submit, please retry</string>
 </resources>

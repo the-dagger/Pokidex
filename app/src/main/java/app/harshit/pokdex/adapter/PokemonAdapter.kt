@@ -79,7 +79,7 @@ class PokemonAdapter(private var pokeList: List<Pokemon>, private val handleFile
                 .setMessage("Select correct pokemon from the list below")
                 .setView(view)
                 .setPositiveButton("Submit") { dialog, _ ->
-                    handleFileUpload.uploadImageToStorage((spinner.selectedItem as Pokemon).name)
+                    handleFileUpload.uploadImageToStorage(spinner.selectedItem as String)
                     dialog.cancel()
                 }
                 .create()

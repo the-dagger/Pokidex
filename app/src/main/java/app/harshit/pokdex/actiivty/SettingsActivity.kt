@@ -45,6 +45,7 @@ class SettingsActivity : AppCompatPreferenceActivity() {
                 true
             }
 
+            findPreference("buildVersion").summary = BuildConfig.VERSION_NAME
             return super.onCreateView(inflater, container, savedInstanceState)
         }
 

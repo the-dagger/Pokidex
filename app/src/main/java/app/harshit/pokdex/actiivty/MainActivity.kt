@@ -1,29 +1,35 @@
 package app.harshit.pokdex.actiivty
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
+import android.os.Build
 import android.os.Bundle
 import android.support.design.widget.BottomSheetBehavior
+import android.support.v4.app.NotificationCompat
 import android.support.v7.widget.LinearLayoutManager
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import app.harshit.pokdex.*
+import android.widget.Toast
+import app.harshit.pokdex.HandleFileUpload
 import app.harshit.pokdex.R
 import app.harshit.pokdex.adapter.PokemonAdapter
 import app.harshit.pokdex.model.Pokemon
-import com.google.android.gms.common.images.internal.ImageUtils
 import com.google.firebase.ml.custom.*
 import com.google.firebase.ml.custom.model.FirebaseCloudModelSource
 import com.google.firebase.ml.custom.model.FirebaseLocalModelSource
+import com.google.firebase.storage.FirebaseStorage
 import com.otaliastudios.cameraview.CameraListener
 import com.otaliastudios.cameraview.CameraUtils
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.pokemon_sheet.*
+import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+
 
 val pokeArray: Array<String> = arrayOf("Abra", "Aerodactyl", "Alakazam", "Arbok", "Arcanine", "Articuno", "Beedrill", "Bellsprout",
         "Blastoise", "Bulbasaur", "Butterfree", "Caterpie", "Chansey", "Charizard", "Charmander", "Charmeleon", "Clefable", "Clefairy", "Cloyster", "Cubone", "Dewgong",
@@ -52,6 +58,10 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
         private const val IMAGE_STD = 128.0f
     }
 
+    private val notificationManager by lazy {
+        getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    }
+    private val rootRef = FirebaseStorage.getInstance().reference.child("pokemon")
     private lateinit var currentBitmap: Bitmap
     private val pokemonList = mutableListOf<Pokemon>()
     private val intValues = IntArray(DIM_IMG_SIZE_X * DIM_IMG_SIZE_Y)
@@ -69,6 +79,11 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
         imgData = ByteBuffer.allocateDirect(
                 4 * DIM_BATCH_SIZE * DIM_IMG_SIZE_X * DIM_IMG_SIZE_Y * DIM_PIXEL_SIZE);
         imgData.order(ByteOrder.nativeOrder())
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(CHANNEL_UPLOAD, getString(R.string.feedback_notification), NotificationManager.IMPORTANCE_HIGH)
+            notificationManager.createNotificationChannel(channel)
+        }
 
         rvLabel.layoutManager = LinearLayoutManager(this)
         itemAdapter = PokemonAdapter(pokemonList, this)
@@ -176,6 +191,32 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
     }
 
     override fun uploadImageToStorage(name: String) {
-        TODO("Not implemented") //To change body of created functions use File | Settings | File Templates.
+        val baos = ByteArrayOutputStream()
+        currentBitmap.compress(Bitmap.CompressFormat.JPEG, 60, baos)
+        val data = baos.toByteArray()
+        rootRef.child(name)
+                .child("${name.toLowerCase()}${System.currentTimeMillis()}.jpg")
+                .putBytes(data)
+                .addOnSuccessListener {
+                    notificationManager.cancel(420)
+                    Toast.makeText(this, getString(R.string.thanks_for_feedback), Toast.LENGTH_SHORT).show()
+                }
+                .addOnFailureListener {
+                    notificationManager.cancel(420)
+                    Toast.makeText(this, getString(R.string.feedback_failed), Toast.LENGTH_SHORT).show()
+                }
+
+        showProgressNotification()
+    }
+
+    private fun showProgressNotification() {
+        val notification = NotificationCompat.Builder(this, CHANNEL_UPLOAD)
+                .setContentTitle(getString(R.string.sending_feedback))
+                .setContentText(getString(R.string.feedback_in_progress))
+                .setSmallIcon(R.drawable.ic_cloud_upload)
+                .setProgress(100, 0, true)
+                .build()
+
+        notificationManager.notify(420, notification)
     }
 }
