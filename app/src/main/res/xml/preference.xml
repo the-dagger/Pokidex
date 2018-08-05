@@ -4,19 +4,16 @@
     <PreferenceCategory android:title="General">
 
         <Preference
-            android:summary="Buy me a beer!"
-            android:title="Donate">
-            <intent
-                android:action="android.intent.action.VIEW"
-                android:data="https://github.com/the-dagger/Pokedex" />
-        </Preference>
+            android:key="donate"
+            android:summary="Buy me a beer and help keep the app Ad-free!"
+            android:title="Donate" />
 
         <Preference
             android:summary="Rate the app on Play Store"
             android:title="Rate">
             <intent
                 android:action="android.intent.action.VIEW"
-                android:data="https://github.com/the-dagger/Pokedex" />
+                android:data="https://play.google.com/store/apps/details?id=app.harshit.pokdex" />
         </Preference>
 
         <Preference

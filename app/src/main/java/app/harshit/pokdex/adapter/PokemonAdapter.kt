@@ -2,7 +2,6 @@ package app.harshit.pokdex.adapter
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.DialogInterface
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
@@ -12,12 +11,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Spinner
-import android.widget.Toast
 import app.harshit.pokdex.HandleFileUpload
 import app.harshit.pokdex.R
-import app.harshit.pokdex.actiivty.isUserSignedIn
-import app.harshit.pokdex.actiivty.pokeArray
-import app.harshit.pokdex.actiivty.startAuth
+import app.harshit.pokdex.activity.isUserSignedIn
+import app.harshit.pokdex.activity.pokeArray
+import app.harshit.pokdex.activity.startAuth
 import app.harshit.pokdex.model.Pokemon
 import kotlinx.android.synthetic.main.item_row.view.*
 

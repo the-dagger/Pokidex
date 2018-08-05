@@ -16,4 +16,5 @@
     <string name="feedback_in_progress">Feedback in progress</string>
     <string name="thanks_for_feedback">Thank you for the feedback!</string>
     <string name="feedback_failed">Failed to submit, please retry</string>
+    <string name="purchase_success">You\'re awesome and you know it!</string>
 </resources>
