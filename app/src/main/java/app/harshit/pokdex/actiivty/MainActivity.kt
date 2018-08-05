@@ -2,9 +2,11 @@ package app.harshit.pokdex.actiivty
 
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.support.design.widget.BottomSheetBehavior
 import android.support.v7.widget.LinearLayoutManager
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -12,6 +14,7 @@ import app.harshit.pokdex.*
 import app.harshit.pokdex.R
 import app.harshit.pokdex.adapter.PokemonAdapter
 import app.harshit.pokdex.model.Pokemon
+import com.google.android.gms.common.images.internal.ImageUtils
 import com.google.firebase.ml.custom.*
 import com.google.firebase.ml.custom.model.FirebaseCloudModelSource
 import com.google.firebase.ml.custom.model.FirebaseLocalModelSource
@@ -22,24 +25,23 @@ import kotlinx.android.synthetic.main.pokemon_sheet.*
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
+val pokeArray: Array<String> = arrayOf("Abra", "Aerodactyl", "Alakazam", "Arbok", "Arcanine", "Articuno", "Beedrill", "Bellsprout",
+        "Blastoise", "Bulbasaur", "Butterfree", "Caterpie", "Chansey", "Charizard", "Charmander", "Charmeleon", "Clefable", "Clefairy", "Cloyster", "Cubone", "Dewgong",
+        "Diglett", "Ditto", "Dodrio", "Doduo", "Dragonair", "Dragonite", "Dratini", "Drowzee", "Dugtrio", "Eevee", "Ekans", "Electabuzz",
+        "Electrode", "Exeggcute", "Exeggutor", "Farfetchd", "Fearow", "Flareon", "Gastly", "Gengar", "Geodude", "Gloom",
+        "Golbat", "Goldeen", "Golduck", "Golem", "Graveler", "Grimer", "Growlithe", "Gyarados", "Haunter", "Hitmonchan",
+        "Hitmonlee", "Horsea", "Hypno", "Ivysaur", "Jigglypuff", "Jolteon", "Jynx", "Kabuto",
+        "Kabutops", "Kadabra", "Kakuna", "Kangaskhan", "Kingler", "Koffing", "Krabby", "Lapras", "Lickitung", "Machamp",
+        "Machoke", "Machop", "Magikarp", "Magmar", "Magnemite", "Magneton", "Mankey", "Marowak", "Meowth", "Metapod",
+        "Mew", "Mewtwo", "Moltres", "Mrmime", "Muk", "Nidoking", "Nidoqueen", "Nidorina", "Nidorino", "Ninetales",
+        "Oddish", "Omanyte", "Omastar", "Onix", "Paras", "Parasect", "Persian", "Pidgeot", "Pidgeotto", "Pidgey",
+        "Pikachu", "Pinsir", "Poliwag", "Poliwhirl", "Poliwrath", "Ponyta", "Porygon", "Primeape", "Psyduck", "Raichu",
+        "Rapidash", "Raticate", "Rattata", "Rhydon", "Rhyhorn", "Sandshrew", "Sandslash", "Scyther", "Seadra",
+        "Seaking", "Seel", "Shellder", "Slowbro", "Slowpoke", "Snorlax", "Spearow", "Squirtle", "Starmie", "Staryu",
+        "Tangela", "Tauros", "Tentacool", "Tentacruel", "Vaporeon", "Venomoth", "Venonat", "Venusaur", "Victreebel",
+        "Vileplume", "Voltorb", "Vulpix", "Wartortle", "Weedle", "Weepinbell", "Weezing", "Wigglytuff", "Zapdos", "Zubat")
+
 class MainActivity : BaseCameraActivity(), HandleFileUpload {
-
-    private val pokeArray: Array<String> = arrayOf("abra", "aerodactyl", "alakazam", "arbok", "arcanine", "articuno", "beedrill", "bellsprout",
-            "blastoise", "bulbasaur", "butterfree", "caterpie", "chansey", "charizard", "charmander", "charmeleon", "clefable", "clefairy", "cloyster", "cubone", "dewgong",
-            "diglett", "ditto", "dodrio", "doduo", "dragonair", "dragonite", "dratini", "drowzee", "dugtrio", "eevee", "ekans", "electabuzz",
-            "electrode", "exeggcute", "exeggutor", "farfetchd", "fearow", "flareon", "gastly", "gengar", "geodude", "gloom",
-            "golbat", "goldeen", "golduck", "golem", "graveler", "grimer", "growlithe", "gyarados", "haunter", "hitmonchan",
-            "hitmonlee", "horsea", "hypno", "ivysaur", "jigglypuff", "jolteon", "jynx", "kabuto",
-            "kabutops", "kadabra", "kakuna", "kangaskhan", "kingler", "koffing", "krabby", "lapras", "lickitung", "machamp",
-            "machoke", "machop", "magikarp", "magmar", "magnemite", "magneton", "mankey", "marowak", "meowth", "metapod",
-            "mew", "mewtwo", "moltres", "mrmime", "muk", "nidoking", "nidoqueen", "nidorina", "nidorino", "ninetales",
-            "oddish", "omanyte", "omastar", "onix", "paras", "parasect", "persian", "pidgeot", "pidgeotto", "pidgey",
-            "pikachu", "pinsir", "poliwag", "poliwhirl", "poliwrath", "ponyta", "porygon", "primeape", "psyduck", "raichu",
-            "rapidash", "raticate", "rattata", "rhydon", "rhyhorn", "sandshrew", "sandslash", "scyther", "seadra",
-            "seaking", "seel", "shellder", "slowbro", "slowpoke", "snorlax", "spearow", "squirtle", "starmie", "staryu",
-            "tangela", "tauros", "tentacool", "tentacruel", "vaporeon", "venomoth", "venonat", "venusaur", "victreebel",
-            "vileplume", "voltorb", "vulpix", "wartortle", "weedle", "weepinbell", "weezing", "wigglytuff", "zapdos", "zubat")
-
     companion object {
         /** Dimensions of inputs.  */
         const val DIM_IMG_SIZE_X = 224
@@ -50,6 +52,8 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
         private const val IMAGE_STD = 128.0f
     }
 
+    private lateinit var currentBitmap: Bitmap
+    private val pokemonList = mutableListOf<Pokemon>()
     private val intValues = IntArray(DIM_IMG_SIZE_X * DIM_IMG_SIZE_Y)
     private lateinit var imgData: ByteBuffer
     private lateinit var fireBaseInterpreter: FirebaseModelInterpreter
@@ -67,7 +71,8 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
         imgData.order(ByteOrder.nativeOrder())
 
         rvLabel.layoutManager = LinearLayoutManager(this)
-
+        itemAdapter = PokemonAdapter(pokemonList, this)
+        rvLabel.adapter = itemAdapter
 //        Load a cloud model using the FirebaseCloudModelSource Builder class
         val cloudSource = FirebaseCloudModelSource.Builder("pokedex")
                 .enableModelUpdates(true)
@@ -102,6 +107,7 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
         cameraView.addCameraListener(object : CameraListener() {
             override fun onPictureTaken(jpeg: ByteArray?) {
                 CameraUtils.decodeBitmap(jpeg) {
+                    currentBitmap = it
                     val scaledBitmap = Bitmap.createScaledBitmap(it, 224, 224, false)
                     getPokemonFromBitmap(scaledBitmap)
                     showPreview()
@@ -147,11 +153,8 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
                         if (fl > .20)
                             pokeList.add(Pokemon(pokeArray[index], fl))
                     }
-
-                    rvLabel.layoutManager = LinearLayoutManager(this)
+                    itemAdapter.setList(pokeList)
                     fabProgressCircle.hide()
-                    itemAdapter = PokemonAdapter(pokeList, this)
-                    rvLabel.adapter = itemAdapter
                     sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED)
                 }
                 ?.addOnFailureListener {
@@ -173,6 +176,6 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
     }
 
     override fun uploadImageToStorage(name: String) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("Not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }

@@ -1,30 +1,45 @@
 package app.harshit.pokdex.actiivty
 
+import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.preference.PreferenceManager
+import app.harshit.pokdex.R
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
 
 fun isUserSignedIn() = FirebaseAuth.getInstance().currentUser != null
 
-fun startAuth(activity: AppCompatActivity) {
-    activity.startActivity(Intent(activity, IntroActivity::class.java))
-    activity.finish()
+fun startAuth(activity: Activity) {
+    val alertDialog = AlertDialog.Builder(activity)
+            .setTitle(activity.getString(R.string.login_text))
+            .setMessage(activity.getString(R.string.logout_message))
+            .setPositiveButton(activity.getString(R.string.yes)) { dialog, _ ->
+                dialog.cancel()
+                activity.startActivity(Intent(activity, IntroActivity::class.java))
+                activity.finish()
+            }
+            .setNegativeButton(activity.getString(R.string.no)) { dialog, _ ->
+                //Do nothing
+                dialog.cancel()
+            }.create()
+    alertDialog.show()
+
 }
 
-fun logoutAndStartAuth(activity: AppCompatActivity) {
+fun logoutAndStartAuth(activity: Activity) {
     val alertDialog = AlertDialog.Builder(activity)
-            .setTitle("Do you wish to log out?")
-            .setPositiveButton("Yes") { dialog, _ ->
+            .setTitle(activity.getString(R.string.logout_text))
+            .setMessage(activity.getString(R.string.logout_message))
+            .setPositiveButton(activity.getString(R.string.yes)) { dialog, _ ->
                 dialog.cancel()
                 AuthUI.getInstance().signOut(activity)
                 activity.startActivity(Intent(activity, IntroActivity::class.java))
                 activity.finish()
             }
-            .setNegativeButton("No") { dialog, _ ->
+            .setNegativeButton(activity.getString(R.string.no)) { dialog, _ ->
                 //Do nothing
                 dialog.cancel()
             }.create()

@@ -26,25 +26,30 @@ class SettingsActivity : AppCompatPreferenceActivity() {
 
         override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View {
 
-            if (isUserSignedIn())
-                findPreference("loginout").summary = "Click to log in"
-            else {
-                findPreference("loginout").title = "${getCurrentUser()?.displayName}"
-                findPreference("loginout").summary = "Click to log out"
+            if (isUserSignedIn()) {
+                findPreference(LOGIN_PREF).title = "${getCurrentUser()?.displayName}"
+                findPreference(LOGIN_PREF).summary = "Click to log out"
+            } else {
+                findPreference(LOGIN_PREF).title = "Login"
+                findPreference(LOGIN_PREF).summary = "Click to log in"
             }
 
-            findPreference("loginout").setOnPreferenceClickListener {
+            findPreference(LOGIN_PREF).setOnPreferenceClickListener {
                 if (isUserSignedIn()) {
                     //If the user was logged in, log him/her out
-                    logoutAndStartAuth(activity as AppCompatActivity)
+                    logoutAndStartAuth(activity)
                 } else {
                     //Else log him/her in
-                    startAuth(activity as AppCompatActivity)
+                    startAuth(activity)
                 }
                 true
             }
 
             return super.onCreateView(inflater, container, savedInstanceState)
+        }
+
+        companion object {
+            private const val LOGIN_PREF = "loginout"
         }
 
     }

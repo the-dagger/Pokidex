@@ -3,9 +3,12 @@
     <string name="detected_items">Detected Pokémon</string>
     <string name="settings">Settings</string>
     <string name="title_activity_settings">Settings</string>
-    <string name="yes">Yes</string>
-    <string name="no">No</string>
     <string name="intro_1_title">Gotta catch \'em all!</string>
     <string name="intro_1_desc">This is an experiment that uses state of the art Machine Learning algorithms to identify Pokémon in the provided Image.</string>
     <string name="login_desc">Login for the best experience and the ability to improve the app with personalized feedback.</string>
+    <string name="logout_text">Do you wish to log out?</string>
+    <string name="login_text">Do you wish to log in?</string>
+    <string name="logout_message">The app will start again</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 </resources>
