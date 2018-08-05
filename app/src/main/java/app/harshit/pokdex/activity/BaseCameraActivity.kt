@@ -1,5 +1,6 @@
 package app.harshit.pokdex.activity
 
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.support.annotation.LayoutRes
 import android.support.design.widget.BottomSheetBehavior
@@ -48,13 +49,14 @@ abstract class BaseCameraActivity : AppCompatActivity(), View.OnClickListener {
         super.onPause()
     }
 
-    protected fun showPreview() {
-        framePreview.visibility = View.VISIBLE
+    protected fun showPreview(bitmap: Bitmap) {
+        imagePreview.visibility = View.VISIBLE
         cameraView.visibility = View.GONE
+        imagePreview.setImageBitmap(bitmap)
     }
 
     fun hidePreview() {
-        framePreview.visibility = View.GONE
+        imagePreview.visibility = View.GONE
         cameraView.visibility = View.VISIBLE
     }
 }

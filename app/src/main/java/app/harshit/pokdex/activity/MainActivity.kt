@@ -5,6 +5,8 @@ import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
 import android.os.Build
 import android.os.Bundle
 import android.support.design.widget.BottomSheetBehavior
@@ -16,6 +18,8 @@ import android.view.View
 import android.widget.Toast
 import app.harshit.pokdex.HandleFileUpload
 import app.harshit.pokdex.R
+import app.harshit.pokdex.R.id.cameraView
+import app.harshit.pokdex.R.id.fab_take_photo
 import app.harshit.pokdex.adapter.PokemonAdapter
 import app.harshit.pokdex.model.Pokemon
 import com.google.firebase.ml.custom.*
@@ -26,11 +30,13 @@ import com.otaliastudios.cameraview.CameraListener
 import com.otaliastudios.cameraview.CameraUtils
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.pokemon_sheet.*
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
 import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
-
+//List of all the pokemon
 val pokeArray: Array<String> = arrayOf("Abra", "Aerodactyl", "Alakazam", "Arbok", "Arcanine", "Articuno", "Beedrill", "Bellsprout",
         "Blastoise", "Bulbasaur", "Butterfree", "Caterpie", "Chansey", "Charizard", "Charmander", "Charmeleon", "Clefable", "Clefairy", "Cloyster", "Cubone", "Dewgong",
         "Diglett", "Ditto", "Dodrio", "Doduo", "Dragonair", "Dragonite", "Dratini", "Drowzee", "Dugtrio", "Eevee", "Ekans", "Electabuzz",
@@ -58,6 +64,8 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
         private const val IMAGE_STD = 128.0f
     }
 
+    var isRefreshVisible = false
+
     private val notificationManager by lazy {
         getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     }
@@ -79,12 +87,6 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
         imgData = ByteBuffer.allocateDirect(
                 4 * DIM_BATCH_SIZE * DIM_IMG_SIZE_X * DIM_IMG_SIZE_Y * DIM_PIXEL_SIZE);
         imgData.order(ByteOrder.nativeOrder())
-
-        btnRetry.setOnClickListener {
-            if (cameraView.visibility == View.VISIBLE) showPreview() else hidePreview()
-            sheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-            itemAdapter.setList(mutableListOf())
-        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(CHANNEL_UPLOAD, getString(R.string.feedback_notification), NotificationManager.IMPORTANCE_HIGH)
@@ -117,26 +119,53 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
 
         fireBaseInterpreter = FirebaseModelInterpreter.getInstance(firebaseModelOptions)!!
 
+        //Specify the input and outputs of the model
         inputOutputOptions = FirebaseModelInputOutputOptions.Builder()
                 .setInputFormat(0, FirebaseModelDataType.FLOAT32, intArrayOf(1, 224, 224, 3))
                 .setOutputFormat(0, FirebaseModelDataType.FLOAT32, intArrayOf(1, 149))
                 .build()
     }
 
+    //Handle FAB click
     override fun onClick(v: View?) {
-        fabProgressCircle.show()
-        cameraView.addCameraListener(object : CameraListener() {
-            override fun onPictureTaken(jpeg: ByteArray?) {
-                CameraUtils.decodeBitmap(jpeg) {
-                    currentBitmap = it
-                    val scaledBitmap = Bitmap.createScaledBitmap(it, 224, 224, false)
-                    getPokemonFromBitmap(scaledBitmap)
-                    showPreview()
-                    imagePreview.setImageBitmap(it)
+        //the if statement is to alternate between the refresh and image capture functionality of FAB
+        if (isRefreshVisible) {
+            //if the refresh icon is visible, change it to camera icon and hide the preview
+            fab_take_photo.setImageResource(R.drawable.ic_camera)
+            hidePreview()
+            cameraView.start()
+            sheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            isRefreshVisible = false
+        } else if (!isRefreshVisible) {
+            //Show the progressbar
+            fabProgressCircle.show()
+            //if the refresh icon isn't visible, change the icon to refresh and show the preview
+            cameraView.capturePicture()
+            cameraView.addCameraListener(object : CameraListener() {
+                override fun onPictureTaken(jpeg: ByteArray) {
+                    isRefreshVisible = true
+                    fab_take_photo.setImageResource(R.drawable.ic_refresh)
+                    convertByteArrayToBitmap(jpeg)
                 }
+            })
+        }
+    }
+
+    fun convertByteArrayToBitmap(byteArray: ByteArray) {
+        //Handle this shit in bg
+        doAsync {
+            var bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
+            val m = Matrix()
+            //to fix images coming out to be rotated
+            m.postRotate(90F)
+            bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, m, true)
+            currentBitmap = bitmap
+            val scaledBitmap = Bitmap.createScaledBitmap(bitmap, 224, 224, false)
+            uiThread {
+                showPreview(bitmap)
+                getPokemonFromBitmap(scaledBitmap)
             }
-        })
-        cameraView.capturePicture()
+        }
     }
 
     private fun convertBitmapToByteBuffer(bitmap: Bitmap?): ByteBuffer {
@@ -160,7 +189,6 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
         val inputs = FirebaseModelInputs.Builder()
                 .add(convertBitmapToByteBuffer(bitmap)) // add() as many input arrays as your model requires
                 .build()
-
         fireBaseInterpreter.run(inputs, inputOutputOptions)
                 ?.addOnSuccessListener {
                     val pokeList = mutableListOf<Pokemon>()
@@ -175,11 +203,12 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
                             pokeList.add(Pokemon(pokeArray[index], fl))
                     }
                     itemAdapter.setList(pokeList)
-                    fabProgressCircle.hide()
                     sheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
                 }
                 ?.addOnFailureListener {
                     it.printStackTrace()
+                }
+                ?.addOnCompleteListener {
                     fabProgressCircle.hide()
                 }
     }
@@ -196,6 +225,7 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
         return true
     }
 
+    //Upload the captured bitmap to Firebase Storage
     override fun uploadImageToStorage(name: String) {
         val baos = ByteArrayOutputStream()
         currentBitmap.compress(Bitmap.CompressFormat.JPEG, 60, baos)
@@ -215,6 +245,7 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
         showProgressNotification()
     }
 
+    //Display a notification when the image is uploaded to firebase storage
     private fun showProgressNotification() {
         val notification = NotificationCompat.Builder(this, CHANNEL_UPLOAD)
                 .setContentTitle(getString(R.string.sending_feedback))

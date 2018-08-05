@@ -13,7 +13,7 @@
             android:title="Rate">
             <intent
                 android:action="android.intent.action.VIEW"
-                android:data="https://play.google.com/store/apps/details?id=app.harshit.pokdex" />
+                android:data="https://play.google.com/store/apps/details?id=app.harshit.pokedex" />
         </Preference>
 
         <Preference

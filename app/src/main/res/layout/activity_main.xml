@@ -9,35 +9,18 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:keepScreenOn="true"
+        android:soundEffectsEnabled="false"
+        app:cameraAudio="off"
         app:cameraFacing="back"
         app:cameraJpegQuality="60"
-        app:cameraWhiteBalance="auto"
-        app:cameraAudio="off"
-        android:soundEffectsEnabled="false"
-        app:cameraPlaySounds="false" />
+        app:cameraPlaySounds="false"
+        app:cameraWhiteBalance="auto" />
 
-    <FrameLayout
-        android:id="@+id/framePreview"
+    <ImageView
+        android:id="@+id/imagePreview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone">
-
-        <ImageView
-            android:id="@+id/imagePreview"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="centerCrop" />
-
-        <ImageButton
-            android:id="@+id/btnRetry"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:layout_gravity="center"
-            android:background="@null"
-            android:scaleType="centerCrop"
-            app:srcCompat="@drawable/ic_refresh" />
-
-    </FrameLayout>
+        android:scaleType="centerCrop" />
 
     <ViewStub
         android:id="@+id/stubView"
