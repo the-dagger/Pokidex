@@ -23,6 +23,7 @@ import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.android.synthetic.main.fragment_intro_login.*
+import org.jetbrains.anko.toast
 
 class IntroActivity : AppIntro2() {
 
@@ -74,7 +75,7 @@ class IntroActivity : AppIntro2() {
                     if (task.isSuccessful) {
                         // Sign in success, update UI with the signed-in user's information
                         introLoginFragment.disableGoogleBtn()
-                        Toast.makeText(this, "Welcome ${FirebaseAuth.getInstance().currentUser?.displayName}!", Toast.LENGTH_SHORT).show()
+                        toast("Welcome ${FirebaseAuth.getInstance().currentUser?.displayName}!")
                     } else {
                         // If sign in fails, display a message to the user.
                     }

@@ -31,6 +31,7 @@ import com.otaliastudios.cameraview.CameraUtils
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.pokemon_sheet.*
 import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.toast
 import org.jetbrains.anko.uiThread
 import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
@@ -131,6 +132,7 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
         //the if statement is to alternate between the refresh and image capture functionality of FAB
         if (isRefreshVisible) {
             //if the refresh icon is visible, change it to camera icon and hide the preview
+            fabProgressCircle.hide()
             fab_take_photo.setImageResource(R.drawable.ic_camera)
             hidePreview()
             cameraView.start()
@@ -186,6 +188,7 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
     }
 
     private fun getPokemonFromBitmap(bitmap: Bitmap?) {
+        fabProgressCircle.hide()
         val inputs = FirebaseModelInputs.Builder()
                 .add(convertBitmapToByteBuffer(bitmap)) // add() as many input arrays as your model requires
                 .build()
@@ -207,9 +210,7 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
                 }
                 ?.addOnFailureListener {
                     it.printStackTrace()
-                }
-                ?.addOnCompleteListener {
-                    fabProgressCircle.hide()
+                    toast("Sorry, there was an error")
                 }
     }
 
@@ -235,11 +236,11 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
                 .putBytes(data)
                 .addOnSuccessListener {
                     notificationManager.cancel(420)
-                    Toast.makeText(this, getString(R.string.thanks_for_feedback), Toast.LENGTH_SHORT).show()
+                    toast(getString(R.string.thanks_for_feedback))
                 }
                 .addOnFailureListener {
                     notificationManager.cancel(420)
-                    Toast.makeText(this, getString(R.string.feedback_failed), Toast.LENGTH_SHORT).show()
+                    toast(getString(R.string.feedback_failed))
                 }
 
         showProgressNotification()

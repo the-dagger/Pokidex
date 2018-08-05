@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import app.harshit.pokdex.*
 import com.android.billingclient.api.*
+import org.jetbrains.anko.toast
 
 class SettingsActivity : AppCompatPreferenceActivity() {
 
@@ -22,9 +23,9 @@ class SettingsActivity : AppCompatPreferenceActivity() {
 
         override fun onPurchasesUpdated(responseCode: Int, purchases: MutableList<Purchase>?) {
             if (responseCode == BillingClient.BillingResponse.OK && purchases != null) {
-                Toast.makeText(activity, getString(R.string.purchase_success), Toast.LENGTH_SHORT).show()
+                toast(getString(R.string.purchase_success))
             } else if (responseCode == BillingClient.BillingResponse.USER_CANCELED) {
-                Toast.makeText(activity, "¯\\_(ツ)_/¯", Toast.LENGTH_SHORT).show()
+                toast("¯\\_(ツ)_/¯")
             }
         }
 
