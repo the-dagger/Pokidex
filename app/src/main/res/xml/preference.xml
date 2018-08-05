@@ -38,7 +38,7 @@
 
         <Preference
             android:key="buildVersion"
-            android:title="Build Version" />
+            android:title="What's new!" />
 
     </PreferenceCategory>
 </PreferenceScreen>

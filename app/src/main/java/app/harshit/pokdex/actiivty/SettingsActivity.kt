@@ -2,6 +2,7 @@ package app.harshit.pokdex.actiivty
 
 import android.os.Bundle
 import android.preference.PreferenceFragment
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.view.LayoutInflater
 import android.view.View
@@ -45,7 +46,17 @@ class SettingsActivity : AppCompatPreferenceActivity() {
                 true
             }
 
-            findPreference("buildVersion").summary = BuildConfig.VERSION_NAME
+            findPreference("buildVersion").summary = "Version ${BuildConfig.VERSION_NAME}"
+
+            findPreference("buildVersion").setOnPreferenceClickListener {
+                AlertDialog.Builder(activity)
+                        .setTitle("What's new!")
+                        .setMessage("Initial Release\nAdded support for Generation one Pokemon")
+                        .setPositiveButton("Ok") { _, _ ->
+
+                        }.show()
+                true
+            }
             return super.onCreateView(inflater, container, savedInstanceState)
         }
 
