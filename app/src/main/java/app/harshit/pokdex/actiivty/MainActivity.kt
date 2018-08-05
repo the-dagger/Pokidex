@@ -1,4 +1,4 @@
-package app.harshit.pokdex
+package app.harshit.pokdex.actiivty
 
 import android.content.Intent
 import android.graphics.Bitmap
@@ -8,6 +8,10 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import app.harshit.pokdex.*
+import app.harshit.pokdex.R
+import app.harshit.pokdex.adapter.PokemonAdapter
+import app.harshit.pokdex.model.Pokemon
 import com.google.firebase.ml.custom.*
 import com.google.firebase.ml.custom.model.FirebaseCloudModelSource
 import com.google.firebase.ml.custom.model.FirebaseLocalModelSource
@@ -18,7 +22,7 @@ import kotlinx.android.synthetic.main.pokemon_sheet.*
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
-class MainActivity : BaseCameraActivity() {
+class MainActivity : BaseCameraActivity(), HandleFileUpload {
 
     private val pokeArray: Array<String> = arrayOf("abra", "aerodactyl", "alakazam", "arbok", "arcanine", "articuno", "beedrill", "bellsprout",
             "blastoise", "bulbasaur", "butterfree", "caterpie", "chansey", "charizard", "charmander", "charmeleon", "clefable", "clefairy", "cloyster", "cubone", "dewgong",
@@ -95,7 +99,7 @@ class MainActivity : BaseCameraActivity() {
 
     override fun onClick(v: View?) {
         fabProgressCircle.show()
-        cameraView.addCameraListener(object : CameraListener(){
+        cameraView.addCameraListener(object : CameraListener() {
             override fun onPictureTaken(jpeg: ByteArray?) {
                 CameraUtils.decodeBitmap(jpeg) {
                     val scaledBitmap = Bitmap.createScaledBitmap(it, 224, 224, false)
@@ -146,7 +150,7 @@ class MainActivity : BaseCameraActivity() {
 
                     rvLabel.layoutManager = LinearLayoutManager(this)
                     fabProgressCircle.hide()
-                    itemAdapter = PokemonAdapter(pokeList)
+                    itemAdapter = PokemonAdapter(pokeList, this)
                     rvLabel.adapter = itemAdapter
                     sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED)
                 }
@@ -168,4 +172,7 @@ class MainActivity : BaseCameraActivity() {
         return true
     }
 
+    override fun uploadImageToStorage(name: String) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 }

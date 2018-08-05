@@ -1,4 +1,4 @@
-package app.harshit.pokdex
+package app.harshit.pokdex.actiivty
 
 import android.content.Intent
 import android.os.Bundle
@@ -13,7 +13,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import com.firebase.ui.auth.AuthUI
+import app.harshit.pokdex.R
 import com.github.paolorotolo.appintro.AppIntro2
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -23,8 +23,6 @@ import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.android.synthetic.main.fragment_intro_login.*
-
-const val RC_SIGN_IN = 4204
 
 class IntroActivity : AppIntro2() {
 
@@ -51,10 +49,6 @@ class IntroActivity : AppIntro2() {
         PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("INTRO", false).apply()
         startActivity(Intent(this, MainActivity::class.java))
         finish()
-    }
-
-    override fun onSkipPressed(currentFragment: Fragment?) {
-        super.onSkipPressed(currentFragment)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

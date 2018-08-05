@@ -8,25 +8,25 @@
         android:label="@string/app_name"
         android:supportsRtl="true">
         <activity
-            android:name=".MainActivity"
+            android:name=".actiivty.MainActivity"
             android:launchMode="singleInstance"
             android:theme="@style/AppThemeNoActionbar" />
         <activity
-            android:name=".SettingsActivity"
+            android:name=".actiivty.SettingsActivity"
             android:label="@string/title_activity_settings"
             android:launchMode="singleInstance"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName=".actiivty.MainActivity"
             android:theme="@style/AppTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="app.harshit.pokdex.MainActivity" />
+                android:value="app.harshit.pokdex.actiivty.MainActivity" />
         </activity>
         <activity
-            android:name=".IntroActivity"
+            android:name=".actiivty.IntroActivity"
             android:launchMode="singleInstance"
             android:theme="@style/AppThemeNoActionbar" />
         <activity
-            android:name=".SplashActivity"
+            android:name=".actiivty.SplashActivity"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

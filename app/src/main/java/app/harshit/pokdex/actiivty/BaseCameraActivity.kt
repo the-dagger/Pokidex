@@ -1,4 +1,4 @@
-package app.harshit.pokdex
+package app.harshit.pokdex.actiivty
 
 import android.os.Bundle
 import android.support.annotation.LayoutRes
@@ -7,7 +7,7 @@ import android.support.design.widget.CoordinatorLayout
 import android.support.v7.app.AppCompatActivity
 import android.view.Gravity
 import android.view.View
-import com.google.firebase.FirebaseApp
+import app.harshit.pokdex.R
 import kotlinx.android.synthetic.main.activity_main.*
 
 abstract class BaseCameraActivity : AppCompatActivity(), View.OnClickListener {

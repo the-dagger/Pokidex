@@ -1,4 +1,4 @@
-package app.harshit.pokdex
+package app.harshit.pokdex.actiivty
 
 import android.content.res.Configuration
 import android.os.Bundle
