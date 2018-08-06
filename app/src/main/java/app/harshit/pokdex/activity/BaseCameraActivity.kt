@@ -6,9 +6,12 @@ import android.support.annotation.LayoutRes
 import android.support.design.widget.BottomSheetBehavior
 import android.support.design.widget.CoordinatorLayout
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.graphics.Palette
 import android.view.Gravity
 import android.view.View
 import app.harshit.pokdex.R
+import com.otaliastudios.cameraview.Gesture
+import com.otaliastudios.cameraview.GestureAction
 import kotlinx.android.synthetic.main.activity_main.*
 
 abstract class BaseCameraActivity : AppCompatActivity(), View.OnClickListener {
@@ -19,6 +22,9 @@ abstract class BaseCameraActivity : AppCompatActivity(), View.OnClickListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         fab_take_photo.setOnClickListener(this)
+        cameraView.mapGesture(Gesture.PINCH, GestureAction.ZOOM)
+        cameraView.mapGesture(Gesture.TAP, GestureAction.FOCUS_WITH_MARKER)
+        hidePreview()
     }
 
     fun setupBottomSheet(@LayoutRes id: Int) {
@@ -36,7 +42,6 @@ abstract class BaseCameraActivity : AppCompatActivity(), View.OnClickListener {
         lp.anchorId = inflatedView.id
         lp.anchorGravity = Gravity.END
         fabProgressCircle.layoutParams = lp
-        //Hide the fab as bottomSheet is expanded
     }
 
     override fun onResume() {
@@ -53,6 +58,10 @@ abstract class BaseCameraActivity : AppCompatActivity(), View.OnClickListener {
         imagePreview.visibility = View.VISIBLE
         cameraView.visibility = View.GONE
         imagePreview.setImageBitmap(bitmap)
+        Palette.from(bitmap).generate {
+            //Extract palette from image and set it as a background for the ImageView
+            it.mutedSwatch?.rgb?.let { it1 -> imagePreview.setBackgroundColor(it1) }
+        }
     }
 
     fun hidePreview() {

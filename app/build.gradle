@@ -36,6 +36,7 @@ dependencies {
     implementation "com.android.support:design:$supportLibVersion"
     implementation "com.android.support:cardview-v7:$supportLibVersion"
     implementation "com.android.support:exifinterface:$supportLibVersion"
+    implementation "com.android.support:palette-v7:$supportLibVersion"
 
     //Firebase and Play Services
     implementation "com.google.firebase:firebase-core:$firebaseVersion"

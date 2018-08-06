@@ -4,23 +4,37 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.otaliastudios.cameraview.CameraView
-        android:id="@+id/cameraView"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:keepScreenOn="true"
-        android:soundEffectsEnabled="false"
-        app:cameraAudio="off"
-        app:cameraFacing="back"
-        app:cameraJpegQuality="60"
-        app:cameraPlaySounds="false"
-        app:cameraWhiteBalance="auto" />
+        android:layout_height="match_parent">
+
+        <com.otaliastudios.cameraview.CameraView
+            android:id="@+id/cameraView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:keepScreenOn="true"
+            android:soundEffectsEnabled="false"
+            app:cameraAudio="off"
+            app:cameraFacing="back"
+            app:cameraJpegQuality="60"
+            app:cameraPlaySounds="false"
+            app:cameraWhiteBalance="auto" />
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="16dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/frame" />
+
+    </FrameLayout>
 
     <ImageView
         android:id="@+id/imagePreview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="centerCrop" />
+        android:background="#000"
+        android:scaleType="fitCenter" />
 
     <ViewStub
         android:id="@+id/stubView"

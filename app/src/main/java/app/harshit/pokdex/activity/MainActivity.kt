@@ -7,12 +7,14 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
+import android.graphics.Point
 import android.os.Build
 import android.os.Bundle
 import android.support.design.widget.BottomSheetBehavior
 import android.support.media.ExifInterface
 import android.support.v4.app.NotificationCompat
 import android.support.v7.widget.LinearLayoutManager
+import android.view.Display
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -88,7 +90,7 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
         supportActionBar?.setDisplayShowTitleEnabled(false)
         setupBottomSheet(R.layout.pokemon_sheet)
         imgData = ByteBuffer.allocateDirect(
-                4 * DIM_BATCH_SIZE * DIM_IMG_SIZE_X * DIM_IMG_SIZE_Y * DIM_PIXEL_SIZE);
+                4 * DIM_BATCH_SIZE * DIM_IMG_SIZE_X * DIM_IMG_SIZE_Y * DIM_PIXEL_SIZE)
         imgData.order(ByteOrder.nativeOrder())
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -148,7 +150,6 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
             cameraView.addCameraListener(object : CameraListener() {
                 override fun onPictureTaken(jpeg: ByteArray) {
                     isRefreshVisible = true
-                    fab_take_photo.setImageResource(R.drawable.ic_refresh)
                     convertByteArrayToBitmap(jpeg)
                 }
             })
@@ -172,11 +173,22 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
 
                 ExifInterface.ORIENTATION_ROTATE_270 -> m.postRotate(270F)
             }
+            //Create a new bitmap with fixed rotation
             bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, m, true)
+
+            //Crop a part of image that's inside viewfinder and perform detection on that image
+            //https://stackoverflow.com/a/8180576/5471095
+            //TODO : Need to find a better way to do this than creating a new bitmap
+            val cropX = (bitmap.width * 0.2).toInt()
+            val cropY = (bitmap.height * 0.25).toInt()
+            bitmap = Bitmap.createBitmap(bitmap, cropX, cropY, bitmap.width - 2 * cropX, bitmap.height - 2 * cropY)
+
             currentBitmap = bitmap
+
             val scaledBitmap = Bitmap.createScaledBitmap(bitmap, 224, 224, false)
             uiThread {
                 showPreview(bitmap)
+                fab_take_photo.setImageResource(R.drawable.ic_refresh)
                 getPokemonFromBitmap(scaledBitmap)
             }
         }
