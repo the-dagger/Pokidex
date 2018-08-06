@@ -164,6 +164,7 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
             var bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
             val m = Matrix()
             //to fix images coming out to be rotated
+            //https://github.com/google/cameraview/issues/22#issuecomment-269321811
             when (orientation) {
                 ExifInterface.ORIENTATION_ROTATE_90 -> m.postRotate(90F)
 
