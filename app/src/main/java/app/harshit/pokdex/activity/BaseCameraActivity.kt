@@ -17,7 +17,7 @@ abstract class BaseCameraActivity : AppCompatActivity(), View.OnClickListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         sheetBehavior = BottomSheetBehavior.from(bottomLayout)
-        sheetBehavior.peekHeight = 224
+        sheetBehavior.isHideable = true
         cameraView.mapGesture(Gesture.PINCH, GestureAction.ZOOM)
         cameraFrame.setOnClickListener(this)
     }

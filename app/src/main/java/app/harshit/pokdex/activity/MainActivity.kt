@@ -89,7 +89,7 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
         imgData.order(ByteOrder.nativeOrder())
-
+        sheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(CHANNEL_UPLOAD, getString(R.string.feedback_notification), NotificationManager.IMPORTANCE_MIN)
             notificationManager.createNotificationChannel(channel)
@@ -166,6 +166,8 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
     override fun onClick(v: View?) {
         //the if statement is to alternate between the refresh and image capture functionality of FAB
         if (v?.id == R.id.cameraFrame) {
+            progressBar.visibility = View.VISIBLE
+            itemAdapter.setList(emptyList())
             cameraView.capturePicture()
             sheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
             cameraView.addCameraListener(object : CameraListener() {
@@ -252,6 +254,9 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
                 ?.addOnFailureListener {
                     it.printStackTrace()
                     toast("Sorry, there was an error")
+                }
+                ?.addOnCompleteListener {
+                    progressBar.visibility = View.GONE
                 }
     }
 

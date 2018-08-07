@@ -9,8 +9,8 @@ android {
         applicationId "app.harshit.pokedex"
         minSdkVersion 19
         targetSdkVersion 27
-        versionCode 11
-        versionName "1.0-beta5"
+        versionCode 13
+        versionName "1.0-beta6"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         aaptOptions {
             noCompress "tflite"
