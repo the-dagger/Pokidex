@@ -14,7 +14,7 @@ Android app that identifies and detects Pokemon in the provided Image using Tens
 [https://www.kaggle.com/thedagger/pokemon-generation-one](https://www.kaggle.com/thedagger/pokemon-generation-one)
 
 # Screenshots 
-![](https://i.imgur.com/hfpLKtX.jpg) 
-![](https://i.imgur.com/jzvijy7.jpg)
+![](https://i.imgur.com/dgOZaW1.jpg) 
+![](https://i.imgur.com/T1ytvCa.jpg)
 
 Built with ❤️ by [@the-dagger](https://github.com/the-dagger)
