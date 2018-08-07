@@ -64,7 +64,7 @@ class SettingsActivity : AppCompatPreferenceActivity() {
             findPreference("buildVersion").setOnPreferenceClickListener {
                 AlertDialog.Builder(activity)
                         .setTitle("What's new!")
-                        .setMessage("Initial Release\nAdded support for Generation one Pokemon")
+                        .setMessage("Added frame to the Camera\nAdd tap-to-capture\nAn all new intro screen!")
                         .setPositiveButton("Ok") { _, _ ->
 
                         }.show()
