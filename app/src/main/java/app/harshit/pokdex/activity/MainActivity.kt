@@ -142,12 +142,12 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
                         .titleTextColor(R.color.white)
                         .descriptionTextSize(16)
                         .descriptionTextColor(R.color.white)
-                        .textTypeface(Typeface.SANS_SERIF)
+                        .textTypeface(Typeface.DEFAULT)
                         .drawShadow(true)
                         .cancelable(true)
                         .tintTarget(true)
                         .transparentTarget(true)
-                        .targetRadius(80),
+                        .targetRadius(180),
                 object : TapTargetView.Listener() {
                     override fun onTargetCancel(view: TapTargetView?) {
                         super.onTargetCancel(view)
