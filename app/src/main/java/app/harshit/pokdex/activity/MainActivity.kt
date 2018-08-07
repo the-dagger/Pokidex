@@ -4,15 +4,14 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Matrix
-import android.graphics.Point
+import android.graphics.*
+import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
 import android.support.design.widget.BottomSheetBehavior
 import android.support.media.ExifInterface
 import android.support.v4.app.NotificationCompat
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.view.Display
 import android.view.Menu
@@ -21,10 +20,11 @@ import android.view.View
 import android.widget.Toast
 import app.harshit.pokdex.HandleFileUpload
 import app.harshit.pokdex.R
-import app.harshit.pokdex.R.id.cameraView
-import app.harshit.pokdex.R.id.fab_take_photo
+import app.harshit.pokdex.R.id.*
 import app.harshit.pokdex.adapter.PokemonAdapter
 import app.harshit.pokdex.model.Pokemon
+import com.getkeepsafe.taptargetview.TapTarget
+import com.getkeepsafe.taptargetview.TapTargetView
 import com.google.firebase.ml.custom.*
 import com.google.firebase.ml.custom.model.FirebaseCloudModelSource
 import com.google.firebase.ml.custom.model.FirebaseLocalModelSource
@@ -33,6 +33,7 @@ import com.otaliastudios.cameraview.CameraListener
 import com.otaliastudios.cameraview.CameraUtils
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.pokemon_sheet.*
+import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.toast
 import org.jetbrains.anko.uiThread
@@ -78,7 +79,8 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
     private lateinit var currentBitmap: Bitmap
     private val pokemonList = mutableListOf<Pokemon>()
     private val intValues = IntArray(DIM_IMG_SIZE_X * DIM_IMG_SIZE_Y)
-    private lateinit var imgData: ByteBuffer
+    private var imgData: ByteBuffer = ByteBuffer.allocateDirect(
+            4 * DIM_BATCH_SIZE * DIM_IMG_SIZE_X * DIM_IMG_SIZE_Y * DIM_PIXEL_SIZE)
     private lateinit var fireBaseInterpreter: FirebaseModelInterpreter
     private lateinit var inputOutputOptions: FirebaseModelInputOutputOptions
 
@@ -88,9 +90,6 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
         super.onCreate(savedInstanceState)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
-        setupBottomSheet(R.layout.pokemon_sheet)
-        imgData = ByteBuffer.allocateDirect(
-                4 * DIM_BATCH_SIZE * DIM_IMG_SIZE_X * DIM_IMG_SIZE_Y * DIM_PIXEL_SIZE)
         imgData.order(ByteOrder.nativeOrder())
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -129,24 +128,43 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
                 .setInputFormat(0, FirebaseModelDataType.FLOAT32, intArrayOf(1, 224, 224, 3))
                 .setOutputFormat(0, FirebaseModelDataType.FLOAT32, intArrayOf(1, 149))
                 .build()
+
+        //Show target if not already shown
+        if (!defaultSharedPreferences.contains("TARGET_INTRO"))
+            showTarget()
     }
 
-    //Handle FAB click
+    private fun showTarget() {
+        TapTargetView.showFor(this,
+                TapTarget.forView(cameraFrame, "Tap to Capture!", "For best results, keep the object within the frame")
+                        .outerCircleColor(R.color.colorPrimary)
+                        .outerCircleAlpha(0.95f)
+                        .targetCircleColor(R.color.white)
+                        .titleTextSize(24)
+                        .titleTextColor(R.color.white)
+                        .descriptionTextSize(16)
+                        .descriptionTextColor(R.color.white)
+                        .textTypeface(Typeface.SANS_SERIF)
+                        .drawShadow(true)
+                        .cancelable(false)
+                        .tintTarget(true)
+                        .transparentTarget(true)
+                        .targetRadius(80),
+                object : TapTargetView.Listener() {
+                    override fun onTargetClick(view: TapTargetView?) {
+                        super.onTargetClick(view)
+                        defaultSharedPreferences.edit().putBoolean("TARGET_INTRO", true).apply()
+                    }
+                }
+        )
+    }
+
+    //Handle clicks
     override fun onClick(v: View?) {
         //the if statement is to alternate between the refresh and image capture functionality of FAB
-        if (isRefreshVisible) {
-            //if the refresh icon is visible, change it to camera icon and hide the preview
-            fabProgressCircle.hide()
-            fab_take_photo.setImageResource(R.drawable.ic_camera)
-            hidePreview()
-            cameraView.start()
-            sheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-            isRefreshVisible = false
-        } else if (!isRefreshVisible) {
-            //Show the progressbar
-            fabProgressCircle.show()
-            //if the refresh icon isn't visible, change the icon to refresh and show the preview
+        if (v?.id == R.id.cameraFrame) {
             cameraView.capturePicture()
+            sheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
             cameraView.addCameraListener(object : CameraListener() {
                 override fun onPictureTaken(jpeg: ByteArray) {
                     isRefreshVisible = true
@@ -158,7 +176,6 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
 
     fun convertByteArrayToBitmap(byteArray: ByteArray) {
         //Handle this shit in bg
-
         doAsync {
             val exifInterface = ExifInterface(ByteArrayInputStream(byteArray))
             val orientation = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1)
@@ -183,12 +200,10 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
             val cropY = (bitmap.height * 0.25).toInt()
             bitmap = Bitmap.createBitmap(bitmap, cropX, cropY, bitmap.width - 2 * cropX, bitmap.height - 2 * cropY)
 
+            //Save the current bitmap for firebase upload
             currentBitmap = bitmap
-
             val scaledBitmap = Bitmap.createScaledBitmap(bitmap, 224, 224, false)
             uiThread {
-                showPreview(bitmap)
-                fab_take_photo.setImageResource(R.drawable.ic_refresh)
                 getPokemonFromBitmap(scaledBitmap)
             }
         }
@@ -212,7 +227,6 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
     }
 
     private fun getPokemonFromBitmap(bitmap: Bitmap?) {
-        fabProgressCircle.hide()
         val inputs = FirebaseModelInputs.Builder()
                 .add(convertBitmapToByteBuffer(bitmap)) // add() as many input arrays as your model requires
                 .build()
@@ -252,6 +266,8 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
 
     //Upload the captured bitmap to Firebase Storage
     override fun uploadImageToStorage(name: String) {
+        //Collapse the sheet after yes/no was tapped
+        sheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         val baos = ByteArrayOutputStream()
         currentBitmap.compress(Bitmap.CompressFormat.JPEG, 60, baos)
         val data = baos.toByteArray()
