@@ -35,12 +35,12 @@ class IntroActivity : AppIntro2() {
         introLoginFragment = IntroLoginFragment.newInstance(getString(R.string.intro_1_title),
                 getString(R.string.login_desc),
                 R.drawable.pokeball,
-                ContextCompat.getColor(this, R.color.colorPrimary),
+                ContextCompat.getColor(this, R.color.red),
                 true)
         addSlide(IntroLoginFragment.newInstance(getString(R.string.intro_1_title),
                 getString(R.string.intro_1_desc),
                 R.drawable.pokedex,
-                ContextCompat.getColor(this, R.color.colorPrimary),
+                ContextCompat.getColor(this, R.color.red),
                 false))
         addSlide(introLoginFragment)
     }
@@ -77,7 +77,7 @@ class IntroActivity : AppIntro2() {
                         introLoginFragment.disableGoogleBtn()
                         toast("Welcome ${FirebaseAuth.getInstance().currentUser?.displayName}!")
                     } else {
-                        // If sign in fails, display a message to the user.
+                        toast(getString(R.string.sign_in_error)).show()
                     }
                 }
     }

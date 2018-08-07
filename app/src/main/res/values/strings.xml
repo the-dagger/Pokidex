@@ -8,7 +8,7 @@
     <string name="login_desc">Login for the best experience and the ability to improve the app with personalized feedback.</string>
     <string name="logout_text">Do you wish to log out?</string>
     <string name="login_text">Do you wish to log in?</string>
-    <string name="logout_message">The app will start again</string>
+    <string name="logout_message">Login to provide feedback and improve the app</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="feedback_notification">Notification for processing the feedback</string>
@@ -17,4 +17,7 @@
     <string name="thanks_for_feedback">Thank you for the feedback!</string>
     <string name="feedback_failed">Failed to submit, please retry</string>
     <string name="purchase_success">You\'re awesome and you know it!</string>
+    <string name="capture">Tap to Capture!</string>
+    <string name="capture_message">For best results, keep the object within the frame</string>
+    <string name="sign_in_error">Sign in failed, please check your network connection</string>
 </resources>

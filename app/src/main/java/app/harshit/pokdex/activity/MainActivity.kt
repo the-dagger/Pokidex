@@ -4,23 +4,22 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
-import android.graphics.*
-import android.graphics.drawable.Drawable
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
+import android.graphics.Typeface
+import android.net.ConnectivityManager
 import android.os.Build
 import android.os.Bundle
 import android.support.design.widget.BottomSheetBehavior
 import android.support.media.ExifInterface
 import android.support.v4.app.NotificationCompat
-import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
-import android.view.Display
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.Toast
 import app.harshit.pokdex.HandleFileUpload
 import app.harshit.pokdex.R
-import app.harshit.pokdex.R.id.*
 import app.harshit.pokdex.adapter.PokemonAdapter
 import app.harshit.pokdex.model.Pokemon
 import com.getkeepsafe.taptargetview.TapTarget
@@ -30,7 +29,6 @@ import com.google.firebase.ml.custom.model.FirebaseCloudModelSource
 import com.google.firebase.ml.custom.model.FirebaseLocalModelSource
 import com.google.firebase.storage.FirebaseStorage
 import com.otaliastudios.cameraview.CameraListener
-import com.otaliastudios.cameraview.CameraUtils
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.pokemon_sheet.*
 import org.jetbrains.anko.defaultSharedPreferences
@@ -93,7 +91,7 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
         imgData.order(ByteOrder.nativeOrder())
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(CHANNEL_UPLOAD, getString(R.string.feedback_notification), NotificationManager.IMPORTANCE_HIGH)
+            val channel = NotificationChannel(CHANNEL_UPLOAD, getString(R.string.feedback_notification), NotificationManager.IMPORTANCE_MIN)
             notificationManager.createNotificationChannel(channel)
         }
 
@@ -136,21 +134,26 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
 
     private fun showTarget() {
         TapTargetView.showFor(this,
-                TapTarget.forView(cameraFrame, "Tap to Capture!", "For best results, keep the object within the frame")
+                TapTarget.forView(cameraFrame, getString(R.string.capture), getString(R.string.capture_message))
                         .outerCircleColor(R.color.colorPrimary)
                         .outerCircleAlpha(0.95f)
-                        .targetCircleColor(R.color.white)
+                        .targetCircleColor(R.color.colorAccent)
                         .titleTextSize(24)
                         .titleTextColor(R.color.white)
                         .descriptionTextSize(16)
                         .descriptionTextColor(R.color.white)
                         .textTypeface(Typeface.SANS_SERIF)
                         .drawShadow(true)
-                        .cancelable(false)
+                        .cancelable(true)
                         .tintTarget(true)
                         .transparentTarget(true)
                         .targetRadius(80),
                 object : TapTargetView.Listener() {
+                    override fun onTargetCancel(view: TapTargetView?) {
+                        super.onTargetCancel(view)
+                        defaultSharedPreferences.edit().putBoolean("TARGET_INTRO", true).apply()
+                    }
+
                     override fun onTargetClick(view: TapTargetView?) {
                         super.onTargetClick(view)
                         defaultSharedPreferences.edit().putBoolean("TARGET_INTRO", true).apply()
@@ -271,19 +274,28 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
         val baos = ByteArrayOutputStream()
         currentBitmap.compress(Bitmap.CompressFormat.JPEG, 60, baos)
         val data = baos.toByteArray()
-        rootRef.child(name)
-                .child("${name.toLowerCase()}${System.currentTimeMillis()}.jpg")
-                .putBytes(data)
-                .addOnSuccessListener {
-                    notificationManager.cancel(420)
-                    toast(getString(R.string.thanks_for_feedback))
-                }
-                .addOnFailureListener {
-                    notificationManager.cancel(420)
-                    toast(getString(R.string.feedback_failed))
-                }
+        if (isNetworkAvailable()) {
+            rootRef.child(name)
+                    .child("${name.toLowerCase()}${System.currentTimeMillis()}.jpg")
+                    .putBytes(data)
+                    .addOnSuccessListener {
+                        notificationManager.cancel(420)
+                        toast(getString(R.string.thanks_for_feedback))
+                    }
+                    .addOnFailureListener {
+                        notificationManager.cancel(420)
+                        toast(getString(R.string.feedback_failed))
+                    }
+            showProgressNotification()
+        } else {
+            toast("No network connection, please retry later")
+        }
+    }
 
-        showProgressNotification()
+    private fun isNetworkAvailable(): Boolean {
+        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetworkInfo = connectivityManager.activeNetworkInfo
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected
     }
 
     //Display a notification when the image is uploaded to firebase storage
