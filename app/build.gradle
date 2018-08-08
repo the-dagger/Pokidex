@@ -9,7 +9,7 @@ android {
         applicationId "app.harshit.pokedex"
         minSdkVersion 19
         targetSdkVersion 27
-        versionCode 13
+        versionCode 15
         versionName "1.0-beta6"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         aaptOptions {

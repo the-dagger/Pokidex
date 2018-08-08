@@ -24,6 +24,7 @@ import app.harshit.pokdex.adapter.PokemonAdapter
 import app.harshit.pokdex.model.Pokemon
 import com.getkeepsafe.taptargetview.TapTarget
 import com.getkeepsafe.taptargetview.TapTargetView
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.ml.custom.*
 import com.google.firebase.ml.custom.model.FirebaseCloudModelSource
 import com.google.firebase.ml.custom.model.FirebaseLocalModelSource
@@ -108,7 +109,7 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
 
         //Load a local model using the FirebaseLocalModelSource Builder class
         val fireBaseLocalModelSource = FirebaseLocalModelSource.Builder("pokedex")
-                .setAssetFilePath("pokedex_84.tflite")
+                .setAssetFilePath("pokedex_91.tflite")
                 .build()
 
         //Registering the model loaded above with the ModelManager Singleton
@@ -275,13 +276,13 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
     //Upload the captured bitmap to Firebase Storage
     override fun uploadImageToStorage(name: String) {
         //Collapse the sheet after yes/no was tapped
-        sheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        sheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
         val baos = ByteArrayOutputStream()
         currentBitmap.compress(Bitmap.CompressFormat.JPEG, 60, baos)
         val data = baos.toByteArray()
         if (isNetworkAvailable()) {
             rootRef.child(name)
-                    .child("${name.toLowerCase()}${System.currentTimeMillis()}.jpg")
+                    .child("${FirebaseAuth.getInstance().currentUser?.displayName}${name.toLowerCase()}${System.currentTimeMillis()}.jpg")
                     .putBytes(data)
                     .addOnSuccessListener {
                         notificationManager.cancel(420)
