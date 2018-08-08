@@ -282,7 +282,7 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
         val data = baos.toByteArray()
         if (isNetworkAvailable()) {
             rootRef.child(name)
-                    .child("${FirebaseAuth.getInstance().currentUser?.displayName}${name.toLowerCase()}${System.currentTimeMillis()}.jpg")
+                    .child("${FirebaseAuth.getInstance().currentUser?.displayName?.split(" ")?.first()}${name.toLowerCase()}${System.currentTimeMillis()}.jpg")
                     .putBytes(data)
                     .addOnSuccessListener {
                         notificationManager.cancel(420)
