@@ -82,7 +82,6 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
             4 * DIM_BATCH_SIZE * DIM_IMG_SIZE_X * DIM_IMG_SIZE_Y * DIM_PIXEL_SIZE)
     private lateinit var fireBaseInterpreter: FirebaseModelInterpreter
     private lateinit var inputOutputOptions: FirebaseModelInputOutputOptions
-
     private lateinit var itemAdapter: PokemonAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -185,30 +184,29 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
         doAsync {
             val exifInterface = ExifInterface(ByteArrayInputStream(byteArray))
             val orientation = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1)
-            var bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
-            val m = Matrix()
+            val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
+
             //to fix images coming out to be rotated
             //https://github.com/google/cameraview/issues/22#issuecomment-269321811
+            val m = Matrix()
             when (orientation) {
                 ExifInterface.ORIENTATION_ROTATE_90 -> m.postRotate(90F)
-
                 ExifInterface.ORIENTATION_ROTATE_180 -> m.postRotate(180F)
-
                 ExifInterface.ORIENTATION_ROTATE_270 -> m.postRotate(270F)
             }
             //Create a new bitmap with fixed rotation
-            bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, m, true)
-
             //Crop a part of image that's inside viewfinder and perform detection on that image
             //https://stackoverflow.com/a/8180576/5471095
             //TODO : Need to find a better way to do this than creating a new bitmap
             val cropX = (bitmap.width * 0.2).toInt()
             val cropY = (bitmap.height * 0.25).toInt()
-            bitmap = Bitmap.createBitmap(bitmap, cropX, cropY, bitmap.width - 2 * cropX, bitmap.height - 2 * cropY)
 
-            //Save the current bitmap for firebase upload
-            currentBitmap = bitmap
-            val scaledBitmap = Bitmap.createScaledBitmap(bitmap, 224, 224, false)
+            currentBitmap = Bitmap.createBitmap(bitmap, cropX, cropY, bitmap.width - 2 * cropX, bitmap.height - 2 * cropY, m, true)
+            //free up the original bitmap
+            bitmap.recycle()
+
+            //create a scaled bitmap for Tensorflow
+            val scaledBitmap = Bitmap.createScaledBitmap(currentBitmap, 224, 224, false)
             uiThread {
                 getPokemonFromBitmap(scaledBitmap)
             }
@@ -232,7 +230,7 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
         return imgData
     }
 
-    private fun getPokemonFromBitmap(bitmap: Bitmap?) {
+    private fun getPokemonFromBitmap(bitmap: Bitmap) {
         val inputs = FirebaseModelInputs.Builder()
                 .add(convertBitmapToByteBuffer(bitmap)) // add() as many input arrays as your model requires
                 .build()
@@ -258,6 +256,7 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
                 }
                 ?.addOnCompleteListener {
                     progressBar.visibility = View.GONE
+                    bitmap.recycle()
                 }
     }
 
@@ -281,20 +280,21 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
         currentBitmap.compress(Bitmap.CompressFormat.JPEG, 60, baos)
         val data = baos.toByteArray()
         if (isNetworkAvailable()) {
+            toast(getString(R.string.thanks_for_feedback))
             rootRef.child(name)
                     .child("${FirebaseAuth.getInstance().currentUser?.displayName?.split(" ")?.first()}${name.toLowerCase()}${System.currentTimeMillis()}.jpg")
                     .putBytes(data)
                     .addOnSuccessListener {
                         notificationManager.cancel(420)
-                        toast(getString(R.string.thanks_for_feedback))
                     }
                     .addOnFailureListener {
                         notificationManager.cancel(420)
                         toast(getString(R.string.feedback_failed))
                     }
+                    .addOnSuccessListener { currentBitmap.recycle() }
             showProgressNotification()
         } else {
-            toast("No network connection, please retry later")
+            toast(getString(R.string.no_network))
         }
     }
 

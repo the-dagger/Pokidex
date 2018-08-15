@@ -9,8 +9,8 @@ android {
         applicationId "app.harshit.pokedex"
         minSdkVersion 19
         targetSdkVersion 27
-        versionCode 15
-        versionName "1.0-beta6"
+        versionCode 16
+        versionName "1.0-beta8"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         aaptOptions {
             noCompress "tflite"
@@ -57,6 +57,7 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     testImplementation 'junit:junit:4.12'
+//    implementation 'org.tensorflow:tensorflow-lite:0.0.0-nightly'
 }
 
 apply plugin: 'com.google.gms.google-services'
