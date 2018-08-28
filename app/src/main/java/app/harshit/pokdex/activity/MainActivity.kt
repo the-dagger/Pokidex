@@ -284,14 +284,13 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
             rootRef.child(name)
                     .child("${FirebaseAuth.getInstance().currentUser?.displayName?.split(" ")?.first()}${name.toLowerCase()}${System.currentTimeMillis()}.jpg")
                     .putBytes(data)
-                    .addOnSuccessListener {
-                        notificationManager.cancel(420)
-                    }
                     .addOnFailureListener {
-                        notificationManager.cancel(420)
                         toast(getString(R.string.feedback_failed))
                     }
-                    .addOnSuccessListener { currentBitmap.recycle() }
+                    .addOnCompleteListener {
+                        notificationManager.cancel(420)
+                        currentBitmap.recycle()
+                    }
             showProgressNotification()
         } else {
             toast(getString(R.string.no_network))

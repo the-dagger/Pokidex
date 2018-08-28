@@ -6,8 +6,8 @@ import android.support.v7.app.AlertDialog
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import app.harshit.pokdex.*
+import app.harshit.pokdex.BuildConfig
+import app.harshit.pokdex.R
 import com.android.billingclient.api.*
 import org.jetbrains.anko.toast
 
