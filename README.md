@@ -9,6 +9,10 @@ Android app that identifies and detects Pokemon in the provided Image using Tens
 2. Add it to your Firebase Console
 3. Profit!
 
+# See how this app was made!
+
+[Building Pokédex in Android using TensorFlow Lite and Firebase ML Kit](https://heartbeat.fritz.ai/building-pok%C3%A9dex-in-android-using-tensorflow-lite-and-firebase-cc780848395)
+
 # Dataset used to train the model
 
 [https://www.kaggle.com/thedagger/pokemon-generation-one](https://www.kaggle.com/thedagger/pokemon-generation-one)
