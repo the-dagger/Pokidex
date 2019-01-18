@@ -3,7 +3,7 @@ package app.harshit.pokdex.activity
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.preference.PreferenceManager
 import app.harshit.pokdex.R

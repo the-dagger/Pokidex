@@ -21,4 +21,5 @@
     <string name="capture_message">For best results, keep the object within the frame</string>
     <string name="sign_in_error">Sign in failed, please check your network connection</string>
     <string name="no_network">No network connection, please retry later</string>
+    <string name="sku_id">harshit.app.pokemon_beer</string>
 </resources>

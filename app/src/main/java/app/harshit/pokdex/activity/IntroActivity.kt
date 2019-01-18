@@ -3,17 +3,19 @@ package app.harshit.pokdex.activity
 import android.content.Intent
 import android.os.Bundle
 import android.preference.PreferenceManager
-import android.support.annotation.ColorInt
-import android.support.annotation.DrawableRes
-import android.support.v4.app.Fragment
-import android.support.v4.content.ContextCompat
-import android.support.v7.app.AppCompatActivity
+import androidx.annotation.ColorInt
+import androidx.annotation.DrawableRes
+import androidx.fragment.app.Fragment
+import androidx.core.content.ContextCompat
+import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import app.harshit.pokdex.R
+import app.harshit.pokdex.R.id.googleButton
+import app.pitech.event.Analytics
 import com.github.paolorotolo.appintro.AppIntro2
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -27,7 +29,10 @@ import org.jetbrains.anko.toast
 
 class IntroActivity : AppIntro2() {
 
-    lateinit var introLoginFragment: IntroLoginFragment
+    private lateinit var introLoginFragment: IntroLoginFragment
+    private val analytics by lazy {
+        Analytics.of(this)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,10 +50,11 @@ class IntroActivity : AppIntro2() {
         addSlide(introLoginFragment)
     }
 
-    override fun onDonePressed(currentFragment: Fragment?) {
+    override fun onDonePressed(currentFragment: androidx.fragment.app.Fragment?) {
         super.onDonePressed(currentFragment)
         PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("INTRO", false).apply()
         startActivity(Intent(this, MainActivity::class.java))
+        analytics.track("Done Pressed")
         finish()
     }
 
@@ -61,6 +67,7 @@ class IntroActivity : AppIntro2() {
             try {
                 val account = task.getResult(ApiException::class.java)
                 firebaseAuthWithGoogle(account)
+                analytics.track("Started Login")
             } catch (e: ApiException) {
                 Log.w("TAG", "Google sign in failed", e)
             }
@@ -68,14 +75,15 @@ class IntroActivity : AppIntro2() {
 
     }
 
-    private fun firebaseAuthWithGoogle(acct: GoogleSignInAccount) {
-        val credential = GoogleAuthProvider.getCredential(acct.idToken, null)
+    private fun firebaseAuthWithGoogle(acct: GoogleSignInAccount?) {
+        val credential = GoogleAuthProvider.getCredential(acct?.idToken, null)
         FirebaseAuth.getInstance().signInWithCredential(credential)
                 .addOnCompleteListener(this) { task ->
                     if (task.isSuccessful) {
                         // Sign in success, update UI with the signed-in user's information
                         introLoginFragment.disableGoogleBtn()
                         toast("Welcome ${FirebaseAuth.getInstance().currentUser?.displayName}!")
+                        analytics.track("User Logged in")
                     } else {
                         toast(getString(R.string.sign_in_error)).show()
                     }
@@ -90,10 +98,13 @@ class IntroActivity : AppIntro2() {
 
         val mGoogleSignInClient = GoogleSignIn.getClient(activity, gso)
         val signInIntent = mGoogleSignInClient.signInIntent
+
+        analytics.track("Start Login")
+
         startActivityForResult(signInIntent, RC_SIGN_IN)
     }
 
-    class IntroLoginFragment : Fragment() {
+    class IntroLoginFragment : androidx.fragment.app.Fragment() {
 
         companion object {
             fun newInstance(title: String, description: String, @DrawableRes image: Int, @ColorInt color: Int, btn: Boolean): IntroLoginFragment {
@@ -136,8 +147,6 @@ class IntroActivity : AppIntro2() {
         fun disableGoogleBtn() {
             googleButton.isEnabled = false
         }
-
-
     }
 
 }

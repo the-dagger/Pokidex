@@ -11,10 +11,10 @@ import android.graphics.Typeface
 import android.net.ConnectivityManager
 import android.os.Build
 import android.os.Bundle
-import android.support.design.widget.BottomSheetBehavior
-import android.support.media.ExifInterface
-import android.support.v4.app.NotificationCompat
-import android.support.v7.widget.LinearLayoutManager
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import androidx.exifinterface.media.ExifInterface
+import androidx.core.app.NotificationCompat
+import androidx.recyclerview.widget.LinearLayoutManager
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -22,6 +22,8 @@ import app.harshit.pokdex.HandleFileUpload
 import app.harshit.pokdex.R
 import app.harshit.pokdex.adapter.PokemonAdapter
 import app.harshit.pokdex.model.Pokemon
+import app.pitech.event.Analytics
+import app.pitech.event.model.Extra
 import com.getkeepsafe.taptargetview.TapTarget
 import com.getkeepsafe.taptargetview.TapTargetView
 import com.google.firebase.auth.FirebaseAuth
@@ -69,6 +71,10 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
         private const val IMAGE_STD = 128.0f
     }
 
+    private val analytics by lazy {
+        Analytics.of(this)
+    }
+
     var isRefreshVisible = false
 
     private val notificationManager by lazy {
@@ -95,7 +101,7 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
             notificationManager.createNotificationChannel(channel)
         }
 
-        rvLabel.layoutManager = LinearLayoutManager(this)
+        rvLabel.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
         itemAdapter = PokemonAdapter(pokemonList, this)
         rvLabel.adapter = itemAdapter
 //        Load a cloud model using the FirebaseCloudModelSource Builder class
@@ -151,11 +157,13 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
                 object : TapTargetView.Listener() {
                     override fun onTargetCancel(view: TapTargetView?) {
                         super.onTargetCancel(view)
+                        analytics.track("Tap target cancelled")
                         defaultSharedPreferences.edit().putBoolean("TARGET_INTRO", true).apply()
                     }
 
                     override fun onTargetClick(view: TapTargetView?) {
                         super.onTargetClick(view)
+                        analytics.track("Tap target clicked")
                         defaultSharedPreferences.edit().putBoolean("TARGET_INTRO", true).apply()
                     }
                 }
@@ -166,12 +174,14 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
     override fun onClick(v: View?) {
         //the if statement is to alternate between the refresh and image capture functionality of FAB
         if (v?.id == R.id.cameraFrame) {
+            analytics.track("Clicked", Extra().set01(v.id.toString()))
             progressBar.visibility = View.VISIBLE
             itemAdapter.setList(emptyList())
             cameraView.capturePicture()
             sheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
             cameraView.addCameraListener(object : CameraListener() {
                 override fun onPictureTaken(jpeg: ByteArray) {
+                    analytics.track("Picture taken")
                     isRefreshVisible = true
                     convertByteArrayToBitmap(jpeg)
                 }
@@ -182,17 +192,17 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
     fun convertByteArrayToBitmap(byteArray: ByteArray) {
         //Handle this shit in bg
         doAsync {
-            val exifInterface = ExifInterface(ByteArrayInputStream(byteArray))
-            val orientation = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1)
+            val exifInterface = androidx.exifinterface.media.ExifInterface(ByteArrayInputStream(byteArray))
+            val orientation = exifInterface.getAttributeInt(androidx.exifinterface.media.ExifInterface.TAG_ORIENTATION, 1)
             val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
 
             //to fix images coming out to be rotated
             //https://github.com/google/cameraview/issues/22#issuecomment-269321811
             val m = Matrix()
             when (orientation) {
-                ExifInterface.ORIENTATION_ROTATE_90 -> m.postRotate(90F)
-                ExifInterface.ORIENTATION_ROTATE_180 -> m.postRotate(180F)
-                ExifInterface.ORIENTATION_ROTATE_270 -> m.postRotate(270F)
+                androidx.exifinterface.media.ExifInterface.ORIENTATION_ROTATE_90 -> m.postRotate(90F)
+                androidx.exifinterface.media.ExifInterface.ORIENTATION_ROTATE_180 -> m.postRotate(180F)
+                androidx.exifinterface.media.ExifInterface.ORIENTATION_ROTATE_270 -> m.postRotate(270F)
             }
             //Create a new bitmap with fixed rotation
             //Crop a part of image that's inside viewfinder and perform detection on that image
@@ -246,6 +256,7 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
                         //Only consider a pokemon when the accuracy is more than 20%
                         if (fl > .20)
                             pokeList.add(Pokemon(pokeArray[index], fl))
+                        analytics.track("Pokemon detected", Extra().set01(pokeArray[index]))
                     }
                     itemAdapter.setList(pokeList)
                     sheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
@@ -253,6 +264,7 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
                 ?.addOnFailureListener {
                     it.printStackTrace()
                     toast("Sorry, there was an error")
+                    analytics.track("Pokemon tracking failed")
                 }
                 ?.addOnCompleteListener {
                     progressBar.visibility = View.GONE
@@ -268,6 +280,7 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         if (item?.itemId == R.id.action_settings) {
             startActivity(Intent(this, SettingsActivity::class.java))
+            analytics.track("Icon clicked", Extra().set01(item.itemId.toString()))
         }
         return true
     }
@@ -288,11 +301,13 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
                         toast(getString(R.string.feedback_failed))
                     }
                     .addOnCompleteListener {
+                        analytics.track("Image uploaded", Extra().set01(name))
                         notificationManager.cancel(420)
                         currentBitmap.recycle()
                     }
             showProgressNotification()
         } else {
+            analytics.track("Image upload failed", Extra().set01(name))
             toast(getString(R.string.no_network))
         }
     }
@@ -311,7 +326,7 @@ class MainActivity : BaseCameraActivity(), HandleFileUpload {
                 .setSmallIcon(R.drawable.ic_cloud_upload)
                 .setProgress(100, 0, true)
                 .build()
-
+        analytics.track("Upload Notification displayed")
         notificationManager.notify(420, notification)
     }
 }
